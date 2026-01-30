@@ -9,6 +9,10 @@ import 'package:secondmain_237/features/authentification/data/datasources/auth_r
 import 'package:secondmain_237/features/authentification/data/repositories/auth_repository_impl.dart';
 import 'package:secondmain_237/features/authentification/presentation/bloc/auth_bloc.dart';
 import 'package:secondmain_237/features/authentification/presentation/bloc/auth_event.dart';
+import 'package:secondmain_237/features/annonces/data/datasources/annonce_remote_datasource.dart';
+import 'package:secondmain_237/features/annonces/data/repositories/annonce_repository_impl.dart';
+import 'package:secondmain_237/features/annonces/presentation/bloc/annonce_bloc.dart';
+
 
 class SecondMainApp extends StatelessWidget {
   const SecondMainApp({Key? key}) : super(key: key);
@@ -17,7 +21,7 @@ class SecondMainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // Initialiser les dépendances
     final dioClient = DioClient();
-    final storage = const FlutterSecureStorage();
+    const storage = FlutterSecureStorage();
 
     final authLocalDataSource = AuthLocalDataSourceImpl(storage: storage);
     final authRemoteDataSource = AuthRemoteDataSourceImpl(dioClient: dioClient);
@@ -27,11 +31,18 @@ class SecondMainApp extends StatelessWidget {
       localDataSource: authLocalDataSource,
     );
 
+    // Initialiser les dépendances Annonces
+    final annonceRemoteDataSource = AnnonceRemoteDataSourceImpl(dioClient: dioClient);
+    final annonceRepository = AnnonceRepositoryImpl(remoteDataSource: annonceRemoteDataSource);
+
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthBloc>(
           create: (context) => AuthBloc(authRepository: authRepository)
             ..add(const CheckAuthStatusEvent()),
+        ),
+        BlocProvider<AnnonceBloc>(
+          create: (context) => AnnonceBloc(annonceRepository: annonceRepository),
         ),
       ],
       child: MaterialApp.router(

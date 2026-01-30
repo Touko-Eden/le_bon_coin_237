@@ -49,6 +49,7 @@ class AppColors {
   static const Color inputBorder = Color(0xFFE0E0E0);
   static const Color inputBorderFocused = primary;
   static const Color inputFill = Color(0xFFFAFAFA);
+  static const Color inputBackground = inputFill;
 
 // Couleurs pour les Ombres
   static const Color shadow = Color(0x1A000000);

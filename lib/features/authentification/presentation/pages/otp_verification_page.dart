@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:secondmain_237/core/constants/app_colors.dart';
 import 'package:secondmain_237/core/constants/app_strings.dart';
 import 'package:secondmain_237/features/authentification/presentation/widgets/custom_button.dart';
+
+import 'package:secondmain_237/features/authentification/presentation/bloc/auth_bloc.dart';
+import 'package:secondmain_237/features/authentification/presentation/bloc/auth_event.dart';
+import 'package:secondmain_237/features/authentification/presentation/bloc/auth_state.dart';
 import 'dart:async';
+
+
 
 class OtpVerificationPage extends StatefulWidget {
   final String phoneNumber;

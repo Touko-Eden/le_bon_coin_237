@@ -7,13 +7,14 @@ class ApiConstants {
   // Pour Android Emulator: utilisez 10.0.2.2 au lieu de localhost
   // Pour appareil physique: utilisez l'IP de votre PC (ex: 192.168.1.X)
   // Pour Web/Chrome: utilisez localhost
-  static String get baseUrl {
-    if (Platform.isAndroid) {
-      // Si tu branches ton tel, mets l'IP. Si c'est l'émeu, mets 10.0.2.2
-      return 'http://192.168.100.134:3000/api';
-    }
-    return 'http://10.0.2.2:3000/api';
-  }
+  // URL de base de l'API
+  // Pour production/physique: utilisez l'IP publique
+  static const String baseUrl = 'http://72.61.17.180:3000/api';
+
+  /*
+  // Pour appareil physique (remplacez par votre IP locale)
+  static const String baseUrl = 'http://192.168.1.X:3000/api';
+  */
 
   // Alternative pour tester depuis un appareil physique
   // static const String baseUrl = 'http://192.168.1.X:3000/api';

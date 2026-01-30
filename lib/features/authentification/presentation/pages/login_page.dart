@@ -21,7 +21,7 @@ class _LoginPageState extends State<LoginPage> {
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  bool _isPhoneLogin = true; // Toggle entre Téléphone et Email
+  bool _isPhoneLogin = true;
   bool _rememberMe = false;
   bool _obscurePassword = true;
 
@@ -34,7 +34,6 @@ class _LoginPageState extends State<LoginPage> {
 
   void _handleLogin() {
     if (_formKey.currentState!.validate()) {
-      // Déclencher l'événement de connexion
       context.read<AuthBloc>().add(
         LoginEvent(
           identifier: _phoneController.text,
@@ -51,10 +50,14 @@ class _LoginPageState extends State<LoginPage> {
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is Authenticated) {
-            // Connexion réussie, naviguer vers l'écran principal
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Connexion réussie ! 🎉'),
+                backgroundColor: AppColors.success,
+              ),
+            );
             context.go('/main');
           } else if (state is AuthError) {
-            // Afficher l'erreur
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
@@ -127,7 +130,7 @@ class _LoginPageState extends State<LoginPage> {
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.2),
+            color: AppColors.primary.withValues(alpha: 0.2),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -382,7 +385,8 @@ class _LoginPageState extends State<LoginPage> {
         const SizedBox(width: 4),
         TextButton(
           onPressed: () {
-            // TODO: Navigation vers l'inscription
+            // Navigation vers l'inscription
+            context.push('/register');
           },
           style: TextButton.styleFrom(
             padding: EdgeInsets.zero,
@@ -394,6 +398,7 @@ class _LoginPageState extends State<LoginPage> {
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: AppColors.primary,
               fontWeight: FontWeight.w600,
+              decoration: TextDecoration.underline,
             ),
           ),
         ),

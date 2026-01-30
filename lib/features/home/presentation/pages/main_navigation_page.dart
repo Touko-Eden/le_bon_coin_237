@@ -19,14 +19,26 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
   final List<Widget> _pages = [
     const HomePage(),
     const AnnoncesListPage(),
-    const CreateAnnoncePage(),
+    // Placeholder pour l'index 2 (Vendre) qui ouvre une nouvelle page
+    const SizedBox.shrink(),
     const ProfilePage(),
   ];
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (index == 2) {
+      // Si on clique sur "Vendre", on navigue vers la page de création
+      //context.pushNamed(RouteNames.createAnnonce);
+      // Utilisation du Navigator classique si GoRouter n'est pas dispo dans le contexte immédiat
+      // ou context.push('/create-annonce');
+      // Pour l'instant on suppose que GoRouter est configuré
+      Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => const CreateAnnoncePage())
+      );
+    } else {
+      setState(() {
+        _selectedIndex = index;
+      });
+    }
   }
 
   @override
@@ -80,12 +92,12 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
           ],
         ),
       ),
-      floatingActionButton: _selectedIndex == 0 || _selectedIndex == 1
-          ? FloatingActionButton(
+      floatingActionButton: FloatingActionButton(
         onPressed: () {
-          setState(() {
-            _selectedIndex = 2; // Navigate to create annonce
-          });
+            // Ouvrir la page de création en modal/stack
+             Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const CreateAnnoncePage())
+            );
         },
         backgroundColor: AppColors.primary,
         child: const Icon(
@@ -93,8 +105,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
           color: AppColors.textWhite,
           size: 32,
         ),
-      )
-          : null,
+      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
