@@ -12,7 +12,7 @@ class ApiConstants {
       // Si tu branches ton tel, mets l'IP. Si c'est l'émeu, mets 10.0.2.2
       return 'http://192.168.100.134:3000/api';
     }
-    return 'http://localhost:3000/api';
+    return 'http://10.0.2.2:3000/api';
   }
 
   // Alternative pour tester depuis un appareil physique
