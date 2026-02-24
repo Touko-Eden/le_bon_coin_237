@@ -73,23 +73,19 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
       return;
     }
 
-    setState(() => _isLoading = true);
 
-// TODO: Implémenter la vérification OTP avec BLoC
-    await Future.delayed(const Duration(seconds: 2));
-
-    setState(() => _isLoading = false);
-
-// TODO: Navigation vers l'écran suivant après succès
-    print('Code OTP vérifié: ${_otpController.text}');
+    context.read<AuthBloc>().add(VerifyPhoneEvent(_otpController.text));
 
   }
 
   void _handleResendCode() {
     if (!_canResend) return;
+    setState(() {
 
-// TODO: Implémenter le renvoi du code OTP
-    print('Renvoi du code OTP');
+      _canResend = false;
+      _resendTimer = 60;
+    });
+    context.read<AuthBloc>().add(ResendOtpEvent());
     _startResendTimer();
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -103,7 +99,30 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is PhoneVerified) {
+          setState(() {
+            _isLoading = false;
+          });
+          context.go('/home');
+        } else if (state is AuthError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: AppColors.error,
+            ),
+          );
+          setState(() {
+            _isLoading = false;
+          });
+        } else if (state is AuthLoading) {
+          setState(() {
+            _isLoading = true;
+          });
+        }
+      },
+      child: Scaffold(
       backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
         leading: IconButton(
@@ -193,8 +212,9 @@ class _OtpVerificationPageState extends State<OtpVerificationPage> {
       ),
     ),
     ),
-    ],
-    ),
+              ],
+          ),
+      ),
     ),
     );
 

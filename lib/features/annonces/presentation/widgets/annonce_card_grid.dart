@@ -10,6 +10,7 @@ class AnnonceCardGrid extends StatelessWidget {
   final String location;
   final String imageUrl;
   final bool isFavorite;
+  final bool showFavorite;
   final VoidCallback onTap;
   final VoidCallback onFavoriteToggle;
 
@@ -20,6 +21,7 @@ class AnnonceCardGrid extends StatelessWidget {
     required this.location,
     required this.imageUrl,
     required this.isFavorite,
+    this.showFavorite = true,
     required this.onTap,
     required this.onFavoriteToggle,
   }) : super(key: key);
@@ -75,25 +77,26 @@ class AnnonceCardGrid extends StatelessWidget {
                     ),
                   ),
                 ),
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: GestureDetector(
-                    onTap: onFavoriteToggle,
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: AppColors.white.withOpacity(0.9),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        isFavorite ? Icons.favorite : Icons.favorite_border,
-                        color: isFavorite ? AppColors.error : AppColors.textHint,
-                        size: 20,
+                if (showFavorite)
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: GestureDetector(
+                      onTap: onFavoriteToggle,
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: AppColors.white.withOpacity(0.9),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: isFavorite ? AppColors.error : AppColors.textHint,
+                          size: 20,
+                        ),
                       ),
                     ),
                   ),
-                ),
               ],
             ),
 

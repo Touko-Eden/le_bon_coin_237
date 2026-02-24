@@ -40,6 +40,37 @@ class AnnonceCreated extends AnnonceState {
   List<Object> get props => [annonce];
 }
 
+class AnnonceUpdated extends AnnonceState {
+  final Annonce annonce;
+
+  const AnnonceUpdated(this.annonce);
+
+  @override
+  List<Object> get props => [annonce];
+}
+
+class AnnonceDeleted extends AnnonceState {
+  const AnnonceDeleted();
+}
+
+class MyAnnoncesLoaded extends AnnonceState {
+  final List<Annonce> annonces;
+
+  const MyAnnoncesLoaded(this.annonces);
+
+  @override
+  List<Object> get props => [annonces];
+}
+
+class FavoritesLoaded extends AnnonceState {
+  final List<Annonce> annonces;
+
+  const FavoritesLoaded(this.annonces);
+
+  @override
+  List<Object> get props => [annonces];
+}
+
 class AnnonceError extends AnnonceState {
   final String message;
 

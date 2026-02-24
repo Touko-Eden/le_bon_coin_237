@@ -1,5 +1,6 @@
 /// Constantes pour les appels API
 import 'dart:io';
+
 class ApiConstants {
   ApiConstants._();
 
@@ -9,7 +10,7 @@ class ApiConstants {
   // Pour Web/Chrome: utilisez localhost
   // URL de base de l'API
   // Pour production/physique: utilisez l'IP publique
-  static const String baseUrl = 'http://72.61.17.180:3000/api';
+  static const String baseUrl = 'http://31.97.159.174:4010/api';
 
   /*
   // Pour appareil physique (remplacez par votre IP locale)
@@ -36,6 +37,29 @@ class ApiConstants {
   static String annonceById(int id) => '/annonces/$id';
   static String userAnnonces(int userId) => '/annonces/user/$userId';
   static const String myAnnonces = '/annonces/my/annonces';
+
+  // Endpoints Favorites
+  static const String favorites = '/favorites';
+  static const String toggleFavorite = '/favorites/toggle';
+  static String checkFavorite(int annonceId) => '/favorites/$annonceId/check';
+
+  // Endpoints Chat
+  static const String chatConversations = '/chat/conversations';
+  static String chatMessages(int conversationId) =>
+      '/chat/conversations/$conversationId/messages';
+  static String chatMarkRead(int conversationId) =>
+      '/chat/conversations/$conversationId/read';
+
+  // Endpoints Orders & Payments
+  static const String orders = '/orders';
+  static const String myOrders = '/orders/my';
+  static String orderById(int id) => '/orders/$id';
+  static String orderCancel(int id) => '/orders/$id/cancel';
+  static String initiatePay(int id) => '/payments/$id/initiate';
+  static String orderStatus(int id) => '/payments/$id/status';
+
+  // Socket base (même hôte que l'API sans /api)
+  static const String socketBase = 'http://31.97.159.174:4010';
 
   // Headers
   static const String contentType = 'application/json';

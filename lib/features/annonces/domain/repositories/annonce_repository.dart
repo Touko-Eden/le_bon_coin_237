@@ -16,4 +16,18 @@ abstract class AnnonceRepository {
     required String location,
     required List<XFile> images,
   });
+  Future<Either<Failure, Annonce>> updateAnnonce({
+    required int id,
+    String? title,
+    String? description,
+    double? price,
+    String? category,
+    String? condition,
+    String? location,
+    List<XFile>? images,
+  });
+  Future<Either<Failure, void>> deleteAnnonce(int id);
+  Future<Either<Failure, List<Annonce>>> getMyAnnonces();
+  Future<Either<Failure, List<Annonce>>> getFavorites();
+  Future<Either<Failure, bool>> toggleFavorite(int annonceId);
 }

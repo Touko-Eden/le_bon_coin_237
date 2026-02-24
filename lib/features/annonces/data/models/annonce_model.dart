@@ -1,24 +1,43 @@
 import '../../../authentification/data/models/user_model.dart';
+import '../../../authentification/domain/entities/user.dart';
 import '../../domain/entities/annonce.dart';
 
 class AnnonceModel extends Annonce {
   const AnnonceModel({
-    required super.id,
-    required super.title,
-    required super.description,
-    required super.price,
-    required super.category,
-    required super.condition,
-    required super.location,
-    required super.images,
-    required super.userId,
-    super.seller,
-    super.status,
-    super.views,
-    super.isFeatured,
-    super.createdAt,
-    super.updatedAt,
-  });
+    required int id,
+    required String title,
+    required String description,
+    required double price,
+    required String category,
+    required String condition,
+    required String location,
+    required List<String> images,
+    required int userId,
+    User? seller,
+    String status = 'active',
+    int views = 0,
+    bool isFeatured = false,
+    bool? isFavorite,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) : super(
+          id: id,
+          title: title,
+          description: description,
+          price: price,
+          category: category,
+          condition: condition,
+          location: location,
+          images: images,
+          userId: userId,
+          seller: seller,
+          status: status,
+          views: views,
+          isFeatured: isFeatured,
+          isFavorite: isFavorite ?? false,
+          createdAt: createdAt,
+          updatedAt: updatedAt,
+        );
 
   factory AnnonceModel.fromJson(Map<String, dynamic> json) {
     return AnnonceModel(
@@ -37,6 +56,7 @@ class AnnonceModel extends Annonce {
       status: json['status'] as String? ?? 'active',
       views: json['views'] as int? ?? 0,
       isFeatured: json['isFeatured'] as bool? ?? false,
+      isFavorite: json['isFavorite'] as bool? ?? false,
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'] as String)
           : null,
@@ -60,6 +80,7 @@ class AnnonceModel extends Annonce {
       'status': status,
       'views': views,
       'isFeatured': isFeatured,
+      'isFavorite': isFavorite,
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
     };
@@ -75,10 +96,11 @@ class AnnonceModel extends Annonce {
     String? location,
     List<String>? images,
     int? userId,
-    UserModel? seller,
+    User? seller,
     String? status,
     int? views,
     bool? isFeatured,
+    bool? isFavorite,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -96,6 +118,7 @@ class AnnonceModel extends Annonce {
       status: status ?? this.status,
       views: views ?? this.views,
       isFeatured: isFeatured ?? this.isFeatured,
+      isFavorite: isFavorite ?? this.isFavorite,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

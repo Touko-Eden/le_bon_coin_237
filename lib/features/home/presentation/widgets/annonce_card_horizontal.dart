@@ -10,6 +10,7 @@ class AnnonceCardHorizontal extends StatelessWidget {
   final String location;
   final String imageUrl;
   final bool isFavorite;
+  final bool showFavorite;
   final VoidCallback onTap;
   final VoidCallback onFavoriteToggle;
 
@@ -20,6 +21,7 @@ class AnnonceCardHorizontal extends StatelessWidget {
     required this.location,
     required this.imageUrl,
     required this.isFavorite,
+    this.showFavorite = true,
     required this.onTap,
     required this.onFavoriteToggle,
   }) : super(key: key);
@@ -128,20 +130,20 @@ class AnnonceCardHorizontal extends StatelessWidget {
             ),
 
             // Bouton Favori
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: IconButton(
-                icon: Icon(
-                  isFavorite ? Icons.favorite : Icons.favorite_border,
-                  color: isFavorite ? AppColors.error : AppColors.textHint,
+            if (showFavorite)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: IconButton(
+                  icon: Icon(
+                    isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color: isFavorite ? AppColors.error : AppColors.textHint,
+                  ),
+                  onPressed: onFavoriteToggle,
                 ),
-                onPressed: onFavoriteToggle,
               ),
-            ),
           ],
         ),
       ),
     );
-
   }
 }

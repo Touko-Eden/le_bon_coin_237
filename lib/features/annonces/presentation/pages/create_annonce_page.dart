@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,28 +23,29 @@ class _CreateAnnoncePageState extends State<CreateAnnoncePage> {
   final _priceController = TextEditingController();
   final _locationController = TextEditingController();
 
-  String _selectedCategory = 'Véhicules';
+  String _selectedCategory = 'Électronique';
   String _selectedCondition = 'Bon état';
   List<XFile> _selectedImages = [];
 
   final ImagePicker _picker = ImagePicker();
 
   final List<String> _categories = [
-    'Véhicules',
-    'Immobilier',
-    'Multimédia',
-    'Maison',
+    'Électronique',
+    'Mobilier',
     'Mode',
-    'Loisirs',
-    'Autres'
+    'Automobile',
+    'Enfants',
+    'Maison',
+    'Sport',
+    'Divers'
   ];
 
   final List<String> _conditions = [
     'Neuf',
-    'Très bon état',
+    'Comme neuf',
     'Bon état',
-    'État correct',
-    'Pour pièces'
+    'État acceptable',
+    'Mauvais état'
   ];
 
   @override
@@ -87,18 +87,18 @@ class _CreateAnnoncePageState extends State<CreateAnnoncePage> {
         );
         return;
       }
-      
+
       context.read<AnnonceBloc>().add(
-        CreateAnnonceEvent(
-          title: _titleController.text,
-          description: _descriptionController.text,
-          price: double.parse(_priceController.text.replaceAll(' ', '')),
-          category: _selectedCategory,
-          condition: _selectedCondition,
-          location: _locationController.text,
-          images: _selectedImages,
-        ),
-      );
+            CreateAnnonceEvent(
+              title: _titleController.text,
+              description: _descriptionController.text,
+              price: double.parse(_priceController.text.replaceAll(' ', '')),
+              category: _selectedCategory,
+              condition: _selectedCondition,
+              location: _locationController.text,
+              images: _selectedImages,
+            ),
+          );
     }
   }
 
@@ -143,9 +143,11 @@ class _CreateAnnoncePageState extends State<CreateAnnoncePage> {
                     Text(
                       'Photos (Min 3)',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: _selectedImages.length < 3 ? AppColors.error : null,
-                      ),
+                            fontWeight: FontWeight.bold,
+                            color: _selectedImages.length < 3
+                                ? AppColors.error
+                                : null,
+                          ),
                     ),
                     const SizedBox(height: 12),
                     _buildImagePicker(),
@@ -154,12 +156,13 @@ class _CreateAnnoncePageState extends State<CreateAnnoncePage> {
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
                           'Veuillez ajouter au moins 3 photos pour que les acheteurs voient bien le produit.',
-                          style: TextStyle(color: AppColors.error, fontSize: 12),
+                          style:
+                              TextStyle(color: AppColors.error, fontSize: 12),
                         ),
                       ),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Titre
                     CustomTextField(
                       controller: _titleController,
@@ -177,7 +180,8 @@ class _CreateAnnoncePageState extends State<CreateAnnoncePage> {
                       label: 'Catégorie *',
                       value: _selectedCategory,
                       items: _categories,
-                      onChanged: (val) => setState(() => _selectedCategory = val!),
+                      onChanged: (val) =>
+                          setState(() => _selectedCategory = val!),
                     ),
 
                     const SizedBox(height: 16),
@@ -187,7 +191,8 @@ class _CreateAnnoncePageState extends State<CreateAnnoncePage> {
                       label: 'État *',
                       value: _selectedCondition,
                       items: _conditions,
-                      onChanged: (val) => setState(() => _selectedCondition = val!),
+                      onChanged: (val) =>
+                          setState(() => _selectedCondition = val!),
                     ),
 
                     const SizedBox(height: 16),
@@ -200,10 +205,14 @@ class _CreateAnnoncePageState extends State<CreateAnnoncePage> {
                       keyboardType: TextInputType.number,
                       enabled: !isLoading,
                       validator: (value) {
-                         if (value == null || value.isEmpty) return 'Le prix est requis';
-                         final cleanValue = value.replaceAll(' ', '');
-                         if (double.tryParse(cleanValue) == null) return 'Prix invalide';
-                         return null;
+                        if (value == null || value.isEmpty)
+                          return 'Le prix est requis';
+                        final cleanValue = value.replaceAll(' ', '');
+                        final parsed = double.tryParse(cleanValue);
+                        if (parsed == null) return 'Prix invalide';
+                        if (parsed <= 0)
+                          return 'Le prix doit être supérieur à 0';
+                        return null;
                       },
                     ),
 
@@ -213,12 +222,15 @@ class _CreateAnnoncePageState extends State<CreateAnnoncePage> {
                     CustomTextField(
                       controller: _descriptionController,
                       label: 'Description *',
-                      hint: 'Décrivez votre article en détail (min 20 caractères)...',
+                      hint:
+                          'Décrivez votre article en détail (min 20 caractères)...',
                       maxLines: 5,
                       enabled: !isLoading,
                       validator: (value) {
-                        if (value == null || value.isEmpty) return 'La description est requise';
-                        if (value.length < 20) return 'La description doit contenir au moins 20 caractères';
+                        if (value == null || value.isEmpty)
+                          return 'La description est requise';
+                        if (value.length < 20)
+                          return 'La description doit contenir au moins 20 caractères';
                         return null;
                       },
                     ),
@@ -232,8 +244,9 @@ class _CreateAnnoncePageState extends State<CreateAnnoncePage> {
                       hint: 'Ex: Douala, Akwa',
                       prefixIcon: const Icon(Icons.location_on_outlined),
                       enabled: !isLoading,
-                      validator: (value) =>
-                          value?.isEmpty ?? true ? 'La localisation est requise' : null,
+                      validator: (value) => value?.isEmpty ?? true
+                          ? 'La localisation est requise'
+                          : null,
                     ),
 
                     const SizedBox(height: 32),
@@ -280,7 +293,8 @@ class _CreateAnnoncePageState extends State<CreateAnnoncePage> {
                   children: [
                     Icon(Icons.camera_alt_outlined, color: Colors.grey),
                     SizedBox(height: 4),
-                    Text('Ajouter', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                    Text('Ajouter',
+                        style: TextStyle(color: Colors.grey, fontSize: 12)),
                   ],
                 ),
               ),
@@ -311,7 +325,8 @@ class _CreateAnnoncePageState extends State<CreateAnnoncePage> {
                       color: Colors.red,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.close, size: 16, color: Colors.white),
+                    child:
+                        const Icon(Icons.close, size: 16, color: Colors.white),
                   ),
                 ),
               ),

@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:secondmain_237/core/constants/app_colors.dart';
 import 'package:secondmain_237/core/constants/app_strings.dart';
+import 'package:secondmain_237/features/annonces/presentation/bloc/annonce_bloc.dart';
+import 'package:secondmain_237/features/annonces/presentation/bloc/annonce_event.dart';
+import 'package:secondmain_237/features/annonces/presentation/bloc/annonce_state.dart';
 import 'package:secondmain_237/features/annonces/presentation/widgets/annonce_card_grid.dart';
 import 'package:secondmain_237/features/home/presentation/widgets/annonce_card_horizontal.dart';
 import 'package:secondmain_237/features/annonces/presentation/widgets/filter_bottom_sheet.dart';
+import 'package:secondmain_237/features/annonces/domain/entities/annonce.dart';
 
 class AnnoncesListPage extends StatefulWidget {
   const AnnoncesListPage({Key? key}) : super(key: key);
@@ -20,95 +25,48 @@ class _AnnoncesListPageState extends State<AnnoncesListPage> {
   String _selectedSort = AppStrings.sortRecent;
   bool _isGridView = true;
 
-// Données factices (TODO: Remplacer par données du backend)
-  final List<Map<String, dynamic>> _annonces = [
-  {
-  'id': '1',
-  'title': 'iPhone 12 Pro Max 256 Go',
-  'price': 350000,
-  'location': AppStrings.douala,
-  'image': 'https://images.unsplash.com/photo-1592286927505-cda0181d1ac8?w=400',
-  'isFavorite': false,
-  'category': AppStrings.electronics,
-},
-{
-'id': '2',
-'title': 'Canapé 3 places en cuir véritable',
-'price': 120000,
-'location': AppStrings.yaounde,
-'image': 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400',
-'isFavorite': true,
-'category': AppStrings.furniture,
-},
-{
-'id': '3',
-'title': 'MacBook Pro 2020 M1',
-'price': 550000,
-'location': AppStrings.douala,
-'image': 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&h=300&fit=crop',
-'isFavorite': false,
-'category': AppStrings.electronics,
-},
-{
-'id': '4',
-'title': 'Toyota Corolla 2018',
-'price': 8500000,
-'location': AppStrings.yaounde,
-'image': 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400&h=300&fit=crop',
-'isFavorite': false,
-'category': AppStrings.automobile,
-},
-{
-'id': '5',
-'title': 'Lit bébé avec matelas',
-'price': 45000,
-'location': AppStrings.bafoussam,
-'image': 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&h=300&fit=crop',
-'isFavorite': true,
-'category': AppStrings.children,
-},
-{
-'id': '6',
-'title': 'Robe de soirée élégante',
-'price': 25000,
-'location': AppStrings.douala,
-'image': 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&h=300&fit=crop',
-'isFavorite': false,
-'category': AppStrings.fashion,
-},
-];
+  List<Annonce> get _filteredAnnonces {
+    // Note: Filtering should ideally happen in the Bloc or Repository
+    // But for now we can filter the loaded list locally
+    final state = context.read<AnnonceBloc>().state;
+    if (state is! AnnonceLoaded) return [];
+    
+    List<Annonce> filtered = state.annonces;
 
-List<Map<String, dynamic>> get _filteredAnnonces {
-  List<Map<String, dynamic>> filtered = _annonces;
+    // Filtrer par catégorie
+    if (_selectedCategory != 'Tous') {
+      filtered = filtered.where((a) => a.category == _selectedCategory).toList();
+    }
 
-// Filtrer par catégorie
-  if (_selectedCategory != 'Tous') {
-  filtered = filtered.where((a) => a['category'] == _selectedCategory).toList();
+    // Recherche
+    if (_searchController.text.isNotEmpty) {
+      filtered = filtered.where((a) =>
+        a.title.toLowerCase().contains(_searchController.text.toLowerCase())
+      ).toList();
+    }
+
+    // Tri
+    if (_selectedSort == AppStrings.sortPriceLow) {
+      filtered.sort((a, b) => a.price.compareTo(b.price));
+    } else if (_selectedSort == AppStrings.sortPriceHigh) {
+      filtered.sort((a, b) => b.price.compareTo(a.price));
+    }
+
+    return filtered;
   }
-
-// Recherche
-  if (_searchController.text.isNotEmpty) {
-  filtered = filtered.where((a) =>
-  a['title'].toLowerCase().contains(_searchController.text.toLowerCase())
-  ).toList();
-  }
-
-// Tri
-  if (_selectedSort == AppStrings.sortPriceLow) {
-  filtered.sort((a, b) => a['price'].compareTo(b['price']));
-  } else if (_selectedSort == AppStrings.sortPriceHigh) {
-  filtered.sort((a, b) => b['price'].compareTo(a['price']));
-  }
-
-  return filtered;
-
-}
 
 @override
-void dispose() {
-  _searchController.dispose();
-  super.dispose();
-}
+  void initState() {
+    super.initState();
+    // Charger les annonces au démarrage
+    context.read<AnnonceBloc>().add(LoadAnnoncesEvent());
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
 void _showFilterSheet() {
   showModalBottomSheet(
@@ -246,91 +204,91 @@ Widget _buildCategoryChips() {
 
 }
 
-Widget _buildAnnoncesList() {
-  if (_isGridView) {
-    return GridView.builder(
-      padding: const EdgeInsets.all(16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 0.75,
-      ),
-      itemCount: _filteredAnnonces.length,
-      itemBuilder: (context, index) {
-        final annonce = _filteredAnnonces[index];
-        return AnnonceCardGrid(
-          title: annonce['title'],
-          price: annonce['price'],
-          location: annonce['location'],
-          imageUrl: annonce['image'],
-          isFavorite: annonce['isFavorite'],
-          onTap: () {
-            context.push('/annonce/${annonce['id']}');
-          },
-          onFavoriteToggle: () {
-            setState(() {
-              annonce['isFavorite'] = !annonce['isFavorite'];
-              });
-          },
-        );
-      },
-    );
-  } else {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: _filteredAnnonces.length,
-      itemBuilder: (context, index) {
-        final annonce = _filteredAnnonces[index];
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: AnnonceCardHorizontal(
-            title: annonce['title'],
-            price: annonce['price'],
-            location: annonce['location'],
-            imageUrl: annonce['image'],
-            isFavorite: annonce['isFavorite'],
-            onTap: () {
-              context.push('/annonce/${annonce['id']}');
-            },
-            onFavoriteToggle: () {
-              setState(() {
-                annonce['isFavorite'] = !annonce['isFavorite'];
-                });
-            },
-          ),
-        );
+  Widget _buildAnnoncesList() {
+    return BlocBuilder<AnnonceBloc, AnnonceState>(
+      builder: (context, state) {
+        if (state is AnnonceLoading) {
+          return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+        } else if (state is AnnonceError) {
+          return Center(child: Text(state.message, style: const TextStyle(color: AppColors.error)));
+        } else if (state is AnnonceLoaded) {
+          if (_filteredAnnonces.isEmpty) {
+            return _buildEmptyState();
+          }
+
+          if (_isGridView) {
+            return GridView.builder(
+              padding: const EdgeInsets.all(16),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 0.75,
+              ),
+              itemCount: _filteredAnnonces.length,
+              itemBuilder: (context, index) {
+                final annonce = _filteredAnnonces[index];
+                return AnnonceCardGrid(
+                  title: annonce.title,
+                  price: annonce.price.toInt(),
+                  location: annonce.location,
+                  imageUrl: annonce.images.isNotEmpty ? annonce.images.first : '',
+                  isFavorite: annonce.isFavorite,
+                  onTap: () {
+                    context.go('/annonce/${annonce.id}');
+                  },
+                  onFavoriteToggle: () {
+                    context.read<AnnonceBloc>().add(ToggleFavoriteEvent(annonce.id));
+                  },
+                );
+              },
+            );
+          } else {
+            return ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: _filteredAnnonces.length,
+              itemBuilder: (context, index) {
+                final annonce = _filteredAnnonces[index];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: AnnonceCardHorizontal(
+                    title: annonce.title,
+                    price: annonce.price.toInt(),
+                    location: annonce.location,
+                    imageUrl: annonce.images.isNotEmpty ? annonce.images.first : '',
+                    isFavorite: annonce.isFavorite,
+                    onTap: () {
+                      context.go('/annonce/${annonce.id}');
+                    },
+                    onFavoriteToggle: () {
+                      context.read<AnnonceBloc>().add(ToggleFavoriteEvent(annonce.id));
+                    },
+                  ),
+                );
+              },
+            );
+          }
+        }
+        return const SizedBox.shrink();
       },
     );
   }
-}
 
-Widget _buildEmptyState() {
-  return Center(
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-      Icon(
-      Icons.search_off,
-      size: 80,
-      color: AppColors.textHint,
-    ),
-    const SizedBox(height: 16),
-    Text(
-      AppStrings.noResults,
-      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-        color: AppColors.textSecondary,
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.search_off, size: 64, color: AppColors.textSecondary),
+          const SizedBox(height: 16),
+          Text(
+            'Aucune annonce trouvée',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ],
       ),
-    ),
-    const SizedBox(height: 8),
-    Text(
-    'Essayez de modifier vos filtres',
-    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-      color: AppColors.textHint,
-    ),
-  ),
-  ],
-  ),
-  );
-}
+    );
+  }
 }

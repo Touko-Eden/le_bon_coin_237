@@ -1,4 +1,3 @@
-
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
@@ -57,6 +56,84 @@ class AnnonceRepositoryImpl implements AnnonceRepository {
         images: images,
       );
       return Right(annonce);
+    } on DioException catch (e) {
+      return Left(_handleDioError(e));
+    } catch (e) {
+      return Left(ServerFailure('Erreur inattendue: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Annonce>> updateAnnonce({
+    required int id,
+    String? title,
+    String? description,
+    double? price,
+    String? category,
+    String? condition,
+    String? location,
+    List<XFile>? images,
+  }) async {
+    try {
+      final annonce = await remoteDataSource.updateAnnonce(
+        id: id,
+        title: title,
+        description: description,
+        price: price,
+        category: category,
+        condition: condition,
+        location: location,
+        images: images,
+      );
+      return Right(annonce);
+    } on DioException catch (e) {
+      return Left(_handleDioError(e));
+    } catch (e) {
+      return Left(ServerFailure('Erreur inattendue: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteAnnonce(int id) async {
+    try {
+      await remoteDataSource.deleteAnnonce(id);
+      return const Right(null);
+    } on DioException catch (e) {
+      return Left(_handleDioError(e));
+    } catch (e) {
+      return Left(ServerFailure('Erreur inattendue: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Annonce>>> getMyAnnonces() async {
+    try {
+      final annonces = await remoteDataSource.getMyAnnonces();
+      return Right(annonces);
+    } on DioException catch (e) {
+      return Left(_handleDioError(e));
+    } catch (e) {
+      return Left(ServerFailure('Erreur inattendue: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Annonce>>> getFavorites() async {
+    try {
+      final annonces = await remoteDataSource.getFavorites();
+      return Right(annonces);
+    } on DioException catch (e) {
+      return Left(_handleDioError(e));
+    } catch (e) {
+      return Left(ServerFailure('Erreur inattendue: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> toggleFavorite(int annonceId) async {
+    try {
+      final isFavorite = await remoteDataSource.toggleFavorite(annonceId);
+      return Right(isFavorite);
     } on DioException catch (e) {
       return Left(_handleDioError(e));
     } catch (e) {

@@ -12,6 +12,9 @@ import 'package:secondmain_237/features/authentification/presentation/bloc/auth_
 import 'package:secondmain_237/features/annonces/data/datasources/annonce_remote_datasource.dart';
 import 'package:secondmain_237/features/annonces/data/repositories/annonce_repository_impl.dart';
 import 'package:secondmain_237/features/annonces/presentation/bloc/annonce_bloc.dart';
+import 'package:secondmain_237/features/chat/data/datasources/chat_remote_datasource.dart';
+import 'package:secondmain_237/features/chat/data/repositories/chat_repository_impl.dart';
+import 'package:secondmain_237/features/chat/presentation/bloc/chat_bloc.dart';
 
 
 class SecondMainApp extends StatelessWidget {
@@ -35,6 +38,10 @@ class SecondMainApp extends StatelessWidget {
     final annonceRemoteDataSource = AnnonceRemoteDataSourceImpl(dioClient: dioClient);
     final annonceRepository = AnnonceRepositoryImpl(remoteDataSource: annonceRemoteDataSource);
 
+    // Dépendances Chat
+    final chatRemoteDataSource = ChatRemoteDataSourceImpl(dioClient: dioClient);
+    final chatRepository = ChatRepositoryImpl(remote: chatRemoteDataSource);
+
     return MultiBlocProvider(
       providers: [
         BlocProvider<AuthBloc>(
@@ -43,6 +50,9 @@ class SecondMainApp extends StatelessWidget {
         ),
         BlocProvider<AnnonceBloc>(
           create: (context) => AnnonceBloc(annonceRepository: annonceRepository),
+        ),
+        BlocProvider<ChatBloc>(
+          create: (context) => ChatBloc(repo: chatRepository),
         ),
       ],
       child: MaterialApp.router(

@@ -1,3 +1,4 @@
+import '../../features/annonces/presentation/pages/edit_annonce_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/authentification/presentation/pages/login_page.dart';
@@ -9,7 +10,13 @@ import '../../features/home/presentation/pages/main_navigation_page.dart';
 import '../../features/annonces/presentation/pages/annonces_list_page.dart';
 import '../../features/annonces/presentation/pages/annonce_detail_page.dart';
 import '../../features/annonces/presentation/pages/create_annonce_page.dart';
+import '../../features/annonces/presentation/pages/my_annonces_page.dart';
+import '../../features/annonces/presentation/pages/favorites_page.dart';
 import '../../features/profile/presentation/pages/profil_page.dart';
+import '../../features/chat/presentation/pages/chat_list_page.dart';
+import '../../features/chat/presentation/pages/chat_page.dart';
+import '../../features/annonces/domain/entities/annonce.dart';
+import '../../features/orders/presentation/pages/my_orders_page.dart';
 
 class RouteNames {
   static const String login = 'login';
@@ -22,6 +29,12 @@ class RouteNames {
   static const String annonceDetail = 'annonce-detail';
   static const String createAnnonce = 'create-annonce';
   static const String profile = 'profile';
+  static const String chatList = 'chat-list';
+  static const String chatDetail = 'chat-detail';
+  static const String myAnnonces = 'my-annonces';
+  static const String favorites = 'favorites';
+  static const String editAnnonce = 'edit-annonce';
+  static const String myOrders = 'my-orders';
 }
 
 class AppRouter {
@@ -82,21 +95,64 @@ class AppRouter {
   name: RouteNames.annonceDetail,
   builder: (context, state) {
   final annonceId = state.pathParameters['id'] ?? '';
-  return AnnonceDetailPage(annonceId: annonceId);
-  },
+      return AnnonceDetailPage(annonceId: annonceId);
+    },
   ),
 
   GoRoute(
-  path: '/create-annonce',
-  name: RouteNames.createAnnonce,
-  builder: (context, state) => const CreateAnnoncePage(),
+    path: '/create-annonce',
+    name: RouteNames.createAnnonce,
+    builder: (context, state) => const CreateAnnoncePage(),
+  ),
+
+  GoRoute(
+    path: '/my-annonces',
+    name: RouteNames.myAnnonces,
+    builder: (context, state) => const MyAnnoncesPage(),
+  ),
+
+  GoRoute(
+    path: '/edit-annonce',
+    name: RouteNames.editAnnonce,
+    builder: (context, state) {
+      final annonce = state.extra as Annonce;
+      return EditAnnoncePage(annonce: annonce);
+    },
+  ),
+
+  GoRoute(
+    path: '/favorites',
+    name: RouteNames.favorites,
+    builder: (context, state) => const FavoritesPage(),
+  ),
+
+  GoRoute(
+    path: '/my-orders',
+    name: RouteNames.myOrders,
+    builder: (context, state) => const MyOrdersPage(),
   ),
 
   // Profile Routes
   GoRoute(
-  path: '/profile',
-  name: RouteNames.profile,
-  builder: (context, state) => const ProfilePage(),
+    path: '/profile',
+    name: RouteNames.profile,
+    builder: (context, state) => const ProfilePage(),
+  ),
+
+  // Chat Routes
+  GoRoute(
+    path: '/chat',
+    name: RouteNames.chatList,
+    builder: (context, state) => const ChatListPage(),
+  ),
+  GoRoute(
+    path: '/chat/:id',
+    name: RouteNames.chatDetail,
+    builder: (context, state) {
+      final id = int.parse(state.pathParameters['id']!);
+      final otherName = state.extra as String? ?? 'Contact';
+      return ChatPage(conversationId: id, otherName: otherName);
+    },
   ),
   ],
 
